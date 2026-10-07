@@ -27,7 +27,7 @@ test('đọc và ghi đi qua đúng kết nối, insert không cần find', asyn
   assert.deepEqual(calls, ['read', 'write']);
 });
 test('cấu hình suy ra tên DB, tiền tố và VAT từ MSSV', () => {
-  const env = { STUDENT_NAME: 'Tran Van Lam', STUDENT_ID: '23IT139', SESSION_SECRET: 'x'.repeat(48),
+  const env = { STUDENT_NAME: 'Tran Van Lam', STUDENT_ID: '23IT139', SESSION_SECRET: 'x'.repeat(48), WEB_READER_USERNAME: 'reader', WEB_WRITER_USERNAME: 'writer', WEB_READER_PASSWORD_HASH: 'scrypt:' + 'a'.repeat(32) + ':' + 'b'.repeat(128), WEB_WRITER_PASSWORD_HASH: 'scrypt:' + 'c'.repeat(32) + ':' + 'd'.repeat(128),
     MONGODB_READ_URI: 'mongodb://reader:secret@localhost', MONGODB_WRITE_URI: 'mongodb://writer:secret@localhost', MONGODB_SESSION_URI: 'mongodb://session:secret@localhost' };
   const c = loadConfig(env);
   assert.equal(c.dbName, 'DB_23IT139'); assert.equal(c.prefix, '139'); assert.equal(c.vat, 15);

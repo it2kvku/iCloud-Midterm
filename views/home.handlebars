@@ -1,14 +1,15 @@
 <section class="hero"><p class="eyebrow">TỦ SÁCH CỦA BẠN</p><h1>Mỗi cuốn sách,<br>một điều mới.</h1><p>Thêm những tựa sách bạn yêu thích và quản lý chúng ở cùng một nơi.</p></section>
 {{#if saved}}<p class="notice" role="status">Đã thêm sách thành công.</p>{{/if}}
-<div class="workspace"><section class="panel"><h2>Thêm sách mới</h2><p class="muted">Mã sách bắt đầu bằng <strong>{{prefix}}</strong>. Giá sau thuế được tính tự động.</p>
+<div class="account-bar"><span>{{user.username}} · {{user.role}}</span><form method="post" action="/logout"><input type="hidden" name="_csrf" value="{{csrf}}"><button type="submit">Đăng xuất</button></form></div>
+<div class="role-workspace">{{#if canWrite}}<section class="panel"><h2>Thêm sách mới</h2><p class="muted">Mã sách bắt đầu bằng <strong>{{prefix}}</strong>. Giá sau thuế được tính tự động.</p>
 <form action="/books" method="post"><input type="hidden" name="_csrf" value="{{csrf}}">
 <label>Mã sách<input name="code" placeholder="{{prefix}}-001" maxlength="40" pattern="{{prefix}}[A-Za-z0-9_-]*" required></label>
 <label>Tên sách<input name="title" placeholder="Nhập tên sách" maxlength="200" required></label>
 <label>Tác giả<input name="author" placeholder="Nhập tên tác giả" maxlength="120" required></label>
 <label>Giá trước thuế (VNĐ)<input name="price" type="number" min="1" max="999999999" step="1" placeholder="100000" required></label>
 <p class="muted">Thuế VAT {{vat}}% · Làm tròn đến đồng</p><button type="submit">Thêm vào tủ sách <span>↗</span></button></form></section>
-<section class="panel catalog"><div class="section-title"><h2>Danh sách sách</h2><span>{{books.length}} sách gần nhất</span></div>
+{{/if}}{{#if canRead}}<section class="panel catalog"><div class="section-title"><h2>Danh sách sách</h2><span>{{books.length}} sách gần nhất</span></div>
 {{#if books}}<div class="table-wrap"><table><thead><tr><th>Sách / Tác giả</th><th>Giá gốc</th><th>VAT</th><th>Sau thuế</th></tr></thead><tbody>
 {{#each books}}<tr><td><small>{{code}}</small><strong>{{title}}</strong><span>{{author}}</span></td><td>{{money price}}</td><td>{{vat}}%</td><td class="total">{{money total}}</td></tr>{{/each}}
 </tbody></table></div>{{else}}<div class="empty"><div class="book-icon">▤</div><h3>Tủ sách đang chờ bạn</h3><p>Thêm cuốn sách đầu tiên bằng biểu mẫu bên cạnh.</p></div>{{/if}}
-<p class="session-note">Phiên bắt đầu: {{startedAt}}</p></section></div>
+</section>{{/if}}<p class="session-note">Phiên bắt đầu: {{startedAt}}</p></div>

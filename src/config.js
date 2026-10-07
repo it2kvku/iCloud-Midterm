@@ -1,3 +1,4 @@
+import { validHash } from './auth.js';
 export function loadConfig(env = process.env) {
   const required = ['STUDENT_NAME', 'STUDENT_ID', 'MONGODB_READ_URI', 'MONGODB_WRITE_URI', 'MONGODB_SESSION_URI', 'SESSION_SECRET'];
   for (const key of required) if (!env[key]?.trim()) throw new Error(`Thiếu biến môi trường ${key}`);
@@ -14,8 +15,16 @@ export function loadConfig(env = process.env) {
   if (new Set(users).size !== 3) throw new Error('Cần ba tài khoản độc lập cho đọc, ghi và session');
   const port = Number(env.PORT || 3000);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT không hợp lệ');
+  const accounts = ['reader', 'writer'].map(role => {
+    const prefix = `WEB_${role.toUpperCase()}`;
+    const username = env[`${prefix}_USERNAME`]?.trim();
+    const passwordHash = env[`${prefix}_PASSWORD_HASH`];
+    if (!username || !validHash(passwordHash)) throw new Error(`Thiếu hoặc sai cấu hình ${prefix}_USERNAME / ${prefix}_PASSWORD_HASH`);
+    return { username, passwordHash, role };
+  });
+  if (accounts[0].username === accounts[1].username) throw new Error('Tên đăng nhập web phải khác nhau');
   return {
-    studentName: env.STUDENT_NAME.trim(), studentId: id, dbName: `DB_${id}`,
+    accounts, studentName: env.STUDENT_NAME.trim(), studentId: id, dbName: `DB_${id}`,
     prefix: id.slice(-3), vat: Number(id.at(-1)) + 6,
     readUri: uris[0], writeUri: uris[1], sessionUri: uris[2],
     sessionSecret: env.SESSION_SECRET, production: env.NODE_ENV === 'production', port,

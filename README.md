@@ -61,7 +61,20 @@ Các instance dùng chung `SESSION_SECRET` và Atlas. Không lưu trạng thái 
 
 `src/database.js` mở đồng thời ba pool độc lập. `src/books.js` điều hướng truy vấn qua đúng pool. POST kiểm tra CSRF và đầu vào, tính `VAT = (chữ số cuối MSSV + 6)%`, `tax = round(price × VAT / 100)`, `total = price + tax` trước khi insert. Giá là số nguyên VNĐ, làm tròn thuế đến đồng. Code không tin VAT/total gửi từ client. Handlebars escape dữ liệu và footer hiện tên, MSSV, VAT.
 
-Danh sách giới hạn 100 sách mới nhất. Đây là ứng dụng bài tập: quyền DB bảo vệ đường truy vấn; chưa có tài khoản đăng nhập hay phân quyền người dùng cuối, nên khách truy cập đều có thể thêm sách qua biểu mẫu.
+Danh sách giới hạn 100 sách mới nhất. Web yêu cầu đăng nhập: Reader chỉ xem sách, Writer chỉ thêm sách. Server kiểm tra vai trò trước khi gọi repository; việc ẩn biểu mẫu không phải lớp bảo vệ duy nhất.
+
+### Đăng nhập web
+
+Hai tài khoản web độc lập với tài khoản Database Users của Atlas:
+
+- `23IT139_reader`: chỉ xem sách, thao tác đọc dùng `MONGODB_READ_URI`.
+- `23IT139_writer`: chỉ thêm sách, thao tác ghi dùng `MONGODB_WRITE_URI`; không gọi truy vấn danh sách.
+
+Mật khẩu web được hash bằng scrypt với salt ngẫu nhiên. Cấu hình `WEB_READER_USERNAME`, `WEB_READER_PASSWORD_HASH`, `WEB_WRITER_USERNAME`, `WEB_WRITER_PASSWORD_HASH` trong `.env` khi chạy local và trong Environment của Render khi triển khai. Không nhập mật khẩu Atlas vào biểu mẫu đăng nhập. Tài khoản web không được tạo trong Database Access; quyền Atlas của hai kết nối hiện có không thay đổi.
+
+Mật khẩu ban đầu của máy phát triển nằm tại `tmp/web-login.txt`, được Git bỏ qua. Phiên đăng nhập lưu trong Atlas; ID phiên được đổi sau đăng nhập và phiên bị hủy khi đăng xuất. Đổi hash mật khẩu sẽ làm phiên cũ không còn hợp lệ. Tất cả instance phải có cùng cấu hình tài khoản và session secret.
+
+Khởi động lại server sau khi cập nhật `.env`. Trước khi deploy code đăng nhập, thêm đủ bốn biến `WEB_*` trên Render để ứng dụng có thể khởi động. Không commit hoặc chia sẻ file chứa mật khẩu ban đầu.
 
 ## 3. Git / DevOps
 

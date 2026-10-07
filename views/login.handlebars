@@ -1,0 +1,6 @@
+<section class="panel login-panel"><p class="eyebrow">BOOKSPACE</p><h1>Đăng nhập</h1><p class="muted">Reader xem danh sách sách. Writer thêm sách mới.</p>
+{{#if error}}<p class="notice" role="alert">{{error}}</p>{{/if}}
+<form method="post" action="/login"><input type="hidden" name="_csrf" value="{{csrf}}">
+<label>Tên đăng nhập<input name="username" autocomplete="username" maxlength="100" required autofocus></label>
+<label>Mật khẩu<input name="password" type="password" autocomplete="current-password" maxlength="256" required></label>
+<button type="submit">Đăng nhập</button></form></section>

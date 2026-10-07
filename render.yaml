@@ -23,3 +23,11 @@ services:
         sync: false
       - key: MONGODB_SESSION_URI
         sync: false
+      - key: WEB_READER_USERNAME
+        value: 23IT139_reader
+      - key: WEB_READER_PASSWORD_HASH
+        sync: false
+      - key: WEB_WRITER_USERNAME
+        value: 23IT139_writer
+      - key: WEB_WRITER_PASSWORD_HASH
+        sync: false
