@@ -1,0 +1,22 @@
+{
+  "name": "cloud-books-midterm",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "dev": "node --watch --env-file-if-exists=.env src/server.js",
+    "test": "node --test",
+    "check": "node --check src/server.js && node --check src/app.js"
+  },
+  "dependencies": {
+    "connect-mongo": "^5.1.0",
+    "express": "^5.1.0",
+    "express-handlebars": "^8.0.3",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "mongodb": "^6.20.0"
+  },
+  "devDependencies": { "supertest": "^7.1.4" }
+}
