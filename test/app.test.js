@@ -12,7 +12,7 @@ class SharedTestStore extends session.Store {
   destroy(id, cb) { this.rows.delete(id); cb?.(); }
   touch(id, data, cb) { this.set(id, data, cb); }
 }
-const config = { studentName: 'Tran Van Lam', studentId: '23IT139', prefix: '139', vat: 14, sessionSecret: 's'.repeat(48), production: false };
+const config = { studentName: 'Tran Van Lam', studentId: '23IT139', prefix: '139', vat: 15, sessionSecret: 's'.repeat(48), production: false };
 function fixture() {
   const store = new SharedTestStore(); const saved = [];
   const books = { list: async () => saved, add: async book => { saved.push(book); } };
@@ -22,12 +22,12 @@ test('hai instance dùng chung session; render footer; lưu giá server tính', 
   const { options, saved } = fixture();
   const first = createApp(options), second = createApp(options);
   const page = await request(first).get('/').expect(200);
-  assert.match(page.text, /Tran Van Lam/); assert.match(page.text, /23IT139/); assert.match(page.text, /14%/);
+  assert.match(page.text, /Tran Van Lam/); assert.match(page.text, /23IT139/); assert.match(page.text, /15%/);
   const cookie = page.headers['set-cookie'][0].split(';')[0];
   assert.match(page.headers['set-cookie'][0], /HttpOnly/);
   const csrf = page.text.match(/name="_csrf" value="([a-f0-9]+)"/)[1];
   await request(second).post('/books').set('Cookie', cookie).type('form').send({ _csrf: csrf, code: '139-1', title: '<script>bad()</script>', author: 'Lam', price: '100000', total: '1' }).expect(303);
-  assert.equal(saved[0].total, 114000);
+  assert.equal(saved[0].total, 115000);
   const result = await request(first).get('/').set('Cookie', cookie).expect(200);
   assert.match(result.text, /&lt;script&gt;/); assert.doesNotMatch(result.text, /<script>bad/);
   assert.match(result.text, new RegExp(csrf));

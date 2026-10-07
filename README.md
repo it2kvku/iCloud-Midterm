@@ -1,6 +1,6 @@
 # Quản lý Sách — Điện toán đám mây
 
-Tran Van Lam · **23IT139** · database **DB_23IT139** · tiền tố **139** · VAT **14%**.
+Tran Van Lam · **23IT139** · database **DB_23IT139** · tiền tố **139** · VAT **15%**.
 
 ## Chạy local
 
@@ -59,7 +59,7 @@ Trình duyệt (cookie mã phiên, HttpOnly / Secure trên HTTPS)
 
 Các instance dùng chung `SESSION_SECRET` và Atlas. Không lưu trạng thái phiên trong MemoryStore hoặc file local, không cần sticky session. Dữ liệu phiên được nạp tạm để xử lý request; nguồn lưu trữ bền vững là MongoDB. Cookie chỉ chứa ID phiên đã ký, không chứa dữ liệu phiên.
 
-`src/database.js` mở đồng thời ba pool độc lập. `src/books.js` điều hướng truy vấn qua đúng pool. POST kiểm tra CSRF và đầu vào, tính `VAT = (chữ số cuối MSSV + 5)%`, `tax = round(price × VAT / 100)`, `total = price + tax` trước khi insert. Giá là số nguyên VNĐ, làm tròn thuế đến đồng. Code không tin VAT/total gửi từ client. Handlebars escape dữ liệu và footer hiện tên, MSSV, VAT.
+`src/database.js` mở đồng thời ba pool độc lập. `src/books.js` điều hướng truy vấn qua đúng pool. POST kiểm tra CSRF và đầu vào, tính `VAT = (chữ số cuối MSSV + 6)%`, `tax = round(price × VAT / 100)`, `total = price + tax` trước khi insert. Giá là số nguyên VNĐ, làm tròn thuế đến đồng. Code không tin VAT/total gửi từ client. Handlebars escape dữ liệu và footer hiện tên, MSSV, VAT.
 
 Danh sách giới hạn 100 sách mới nhất. Đây là ứng dụng bài tập: quyền DB bảo vệ đường truy vấn; chưa có tài khoản đăng nhập hay phân quyền người dùng cuối, nên khách truy cập đều có thể thêm sách qua biểu mẫu.
 
@@ -74,7 +74,7 @@ git check-ignore .env
 
 GitHub Actions chạy syntax check, tests và audit dependencies. `.gitignore` loại `.env`, cache, node_modules và logs. `.env.example` chỉ chứa placeholder, thông tin sinh viên không phải bí mật.
 
-Tạo repository **Private** trên GitHub, không khởi tạo README để tránh lịch sử khác, rồi chạy với URL repository thật:
+Tạo repository trên GitHub (Public hoặc Private đều được theo đề mới), không khởi tạo README để tránh lịch sử khác, rồi chạy với URL repository thật:
 
 ```powershell
 git remote add origin https://github.com/YOUR_ACCOUNT/icloud-midterm.git
@@ -82,11 +82,11 @@ git push -u origin main
 git push origin feature/database feature/session
 ```
 
-Vào **Settings → Collaborators → Add people**, mời tài khoản GitHub giảng viên được cung cấp. Giữ repository Private, chờ giảng viên nhận lời mời. Không squash/rebase lịch sử hai merge node khi nộp bài.
+Nếu chọn Private, mời giảng viên qua **Settings → Collaborators → Add people** để có thể chấm bài. Đề mới không bắt buộc Private. Không squash/rebase lịch sử hai merge node khi nộp bài.
 
 ## 4. Deploy Render
 
-Kết nối GitHub với Render, chọn **New → Blueprint**, chọn repository private và dùng `render.yaml`. Blueprint chọn **Starter (có phí)**; kiểm tra chi phí trên Render trước khi tạo dịch vụ. Free ngủ sau 15 phút không truy cập, không phù hợp yêu cầu luôn chạy. Cấu hình stateless cho phép nhiều instance nhưng không tự bật autoscaling; việc scale cần gói Render hỗ trợ và thiết lập tương ứng.
+Kết nối GitHub với Render, chọn **New → Blueprint**, chọn repository và dùng `render.yaml`. Blueprint chọn **Starter (có phí)**; kiểm tra chi phí trên Render trước khi tạo dịch vụ. Free ngủ sau 15 phút không truy cập, không phù hợp yêu cầu luôn chạy. Cấu hình stateless cho phép nhiều instance nhưng không tự bật autoscaling; việc scale cần gói Render hỗ trợ và thiết lập tương ứng.
 
 Các URI được nhập trong giao diện **Environment** của Render, không đưa vào YAML. `SESSION_SECRET` được sinh khi tạo dịch vụ; nếu có nhiều dịch vụ/instance dùng cùng session thì phải dùng chung secret. `NODE_ENV=production` bật cookie Secure, Express tin một reverse proxy của Render. Nếu đổi cấu trúc proxy, cần cấu hình lại trust proxy theo hạ tầng.
 
@@ -95,11 +95,11 @@ Build: `npm ci --omit=dev`; start: `npm start`; health: `/healthz`. Render cấp
 ## 5. Kiểm chứng và minh chứng nộp bài
 
 1. Chụp Database Users / Custom Roles (ẩn thông tin bí mật), collections và indexes.
-2. Thêm `139-001`, giá `100000`: kết quả `114000`, footer VAT 14%.
+2. Thêm `139-001`, giá `100000`: kết quả `115000`, footer VAT 15%.
 3. Gửi mã `138-001` (có thể cần bỏ kiểm tra HTML bằng DevTools): server trả 400, không insert. Mã trùng trả 409 khi unique index đã tạo.
 4. Kiểm thử quyền bằng mongosh với từng user: reader đọc books được, insert bị Unauthorized; writer insert được, find/update/delete bị Unauthorized. Dùng dữ liệu thử và quản trị viên dọn sau. Session user chỉ truy cập sessions. Không chạy kiểm thử ghi lên dữ liệu cần giữ.
 5. Giữ nguyên cookie trình duyệt, restart dịch vụ hoặc chuyển instance: trường “Phiên bắt đầu” không đổi. Kiểm tra Atlas có document session và TTL index. Không chia sẻ giá trị cookie/session ID khi chụp hình.
-6. Chụp cây Git có hai merge node, repo Private, lời mời giảng viên, CI thành công và URL Render HTTPS hoạt động.
+6. Chụp cây Git có hai merge node, repository GitHub, CI thành công và URL Render HTTPS hoạt động.
 
 Tests tự động dùng kho session giả chỉ trong `test/` để xác minh hai Express instance chia sẻ phiên, CSRF, escaping, tính thuế, validation và điều hướng đọc/ghi. Chúng **không chứng minh** quyền Atlas hay session bền vững trên cloud; phải thực hiện kiểm tra thật ở trên sau khi cấu hình credentials.
 
@@ -112,4 +112,6 @@ Tests tự động dùng kho session giả chỉ trong `test/` để xác minh h
 
 ## Trạng thái bàn giao
 
-Mã nguồn, kiểm thử local, lịch sử nhánh và cấu hình deployment đã chuẩn bị. Chưa xác minh Atlas thật, chưa push GitHub, chưa mời giảng viên, chưa tạo dịch vụ Render. Các bước này cần cấu hình tài khoản/URI, repository và tài khoản giảng viên.
+Ứng dụng đã kết nối Atlas và mã nguồn đã được đẩy lên GitHub. Ảnh minh chứng ghi nhận deploy Render thành công. Phiên bản mới đổi VAT thành 15%; cần deploy phiên bản mới để áp dụng.
+
+Dữ liệu sách cũ giữ nguyên mức thuế đã lưu. Để chuyển dữ liệu mẫu sang VAT 15%, quản trị viên có thể chạy `scripts/migrate-vat.mongodb.js` trong mongosh. Script tính lại thuế từ giá gốc, không cộng thuế vào giá đã có thuế. User ghi sách chỉ có `insert`, vì vậy ứng dụng không tự sửa dữ liệu cũ hoặc mở rộng quyền của tài khoản này.

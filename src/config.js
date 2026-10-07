@@ -16,7 +16,7 @@ export function loadConfig(env = process.env) {
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT không hợp lệ');
   return {
     studentName: env.STUDENT_NAME.trim(), studentId: id, dbName: `DB_${id}`,
-    prefix: id.slice(-3), vat: Number(id.at(-1)) + 5,
+    prefix: id.slice(-3), vat: Number(id.at(-1)) + 6,
     readUri: uris[0], writeUri: uris[1], sessionUri: uris[2],
     sessionSecret: env.SESSION_SECRET, production: env.NODE_ENV === 'production', port,
   };
